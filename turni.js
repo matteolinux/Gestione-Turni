@@ -1,7 +1,9 @@
-// Sostituiamo la definizione costante con una let
-let turni = JSON.parse(localStorage.getItem('turniDizionario')) || {
+// Definiamo il dizionario come fonte primaria dei dati
+let turni = {
+    "311": { inizio: "13:30", fine: "17:30" },
 
-    
+    "232": { inizio: "05:50", fine: "13:30" },
+    "35": { inizio: "11:30", fine: "17:30" }
 };
 
 // All'inizio del file, definiamo i colori delle celle come costanti
@@ -414,8 +416,8 @@ function importaDati(input) {
     input.value = '';
 }
 
-// Modifichiamo la funzione aggiungiTurnoStraordinario per salvare nel localStorage
-function aggiungiTurnoStraordinario() {
+// La funzione aggiungiTurnoStraordinario ora non salva più nel localStorage
+async function aggiungiTurnoStraordinario() {
     const numeroTreno = document.getElementById('nuovo-treno').value;
     const oraInizio = document.getElementById('ora-inizio').value;
     const oraFine = document.getElementById('ora-fine').value;
@@ -430,26 +432,45 @@ function aggiungiTurnoStraordinario() {
         return;
     }
 
-    // Aggiungi il nuovo turno al dizionario
-    turni[numeroTreno] = {
-        inizio: oraInizio,
-        fine: oraFine
-    };
+    try {
+        // Invia i dati al server
+        const response = await fetch('http://localhost:3000/aggiungiTurno', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                numeroTreno,
+                oraInizio,
+                oraFine
+            })
+        });
 
-    // Salva nel localStorage
-    localStorage.setItem('turniDizionario', JSON.stringify(turni));
+        if (!response.ok) {
+            throw new Error('Errore durante il salvataggio');
+        }
 
-    // Aggiorna il select dei treni
-    const selectTreni = document.getElementById('numero-treno');
-    const option = document.createElement('option');
-    option.value = numeroTreno;
-    option.textContent = `${numeroTreno} (${oraInizio}-${oraFine})`;
-    selectTreni.appendChild(option);
+        // Aggiungi il nuovo turno al dizionario in memoria
+        turni[numeroTreno] = {
+            inizio: oraInizio,
+            fine: oraFine
+        };
 
-    // Reset form
-    document.getElementById('nuovo-treno').value = '';
-    document.getElementById('ora-inizio').value = '';
-    document.getElementById('ora-fine').value = '';
+        // Aggiorna il select dei treni
+        const selectTreni = document.getElementById('numero-treno');
+        const option = document.createElement('option');
+        option.value = numeroTreno;
+        option.textContent = `${numeroTreno} (${oraInizio}-${oraFine})`;
+        selectTreni.appendChild(option);
 
-    alert('Turno straordinario aggiunto con successo!');
+        // Reset form
+        document.getElementById('nuovo-treno').value = '';
+        document.getElementById('ora-inizio').value = '';
+        document.getElementById('ora-fine').value = '';
+
+        alert('Turno straordinario aggiunto con successo!');
+        
+    } catch (error) {
+        alert('Errore durante l\'aggiunta del turno: ' + error.message);
+    }
 } 
