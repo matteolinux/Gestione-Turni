@@ -17,9 +17,20 @@
                     <option value="matteo">Matteo</option>
                     <option value="sara">Sara</option>
                 </select>
-                <input type="text" id="numero-treno" placeholder="Numero Treno">
+                <select id="numero-treno">
+                    <option value="">Seleziona Treno</option>
+                </select>
                 <button onclick="aggiungiTurno()">Aggiungi</button>
                 <button onclick="ripulisciGiorno()" class="button-delete">Ripulisci Giorno</button>
+            </div>
+            <div class="form-group">
+                <h3>Aggiungi Turno Straordinario</h3>
+                <input type="text" id="nuovo-treno" placeholder="Numero Nuovo Treno">
+                <div class="orari-group">
+                    <input type="time" id="ora-inizio" placeholder="Ora inizio">
+                    <input type="time" id="ora-fine" placeholder="Ora fine">
+                </div>
+                <button onclick="aggiungiTurnoStraordinario()" class="button-add">Aggiungi al Dizionario</button>
             </div>
             <div class="colori-section">
                 <h3>Personalizza Colori</h3>

@@ -1,11 +1,7 @@
-// Definizione dei turni standard
-const turni = {
-    "IC123": { inizio: "08:00", fine: "16:00" },
-    "IC456": { inizio: "14:00", fine: "22:00" },
-    "IC789": { inizio: "06:00", fine: "14:00" },
-    "IC012": { inizio: "16:00", fine: "24:00" },
-    "232": { inizio: "05:50", fine: "13:30" },
-    "35": { inizio: "11:30", fine: "17:30" },
+// Sostituiamo la definizione costante con una let
+let turni = JSON.parse(localStorage.getItem('turniDizionario')) || {
+
+    
 };
 
 // All'inizio del file, definiamo i colori delle celle come costanti
@@ -29,12 +25,6 @@ const COLORI_DEFAULT = {
 
 // Definizione della configurazione di default
 const CONFIG_DEFAULT = {
-    turniStandard: {
-        "IC123": { inizio: "08:00", fine: "16:00" },
-        "IC456": { inizio: "14:00", fine: "22:00" },
-        "IC789": { inizio: "06:00", fine: "14:00" },
-        "IC012": { inizio: "16:00", fine: "24:00" }
-    },
     logicaColori: {
         sovrapposizione: "#f10b22",
         scartoMinore2: "#f10b22",
@@ -71,7 +61,10 @@ function calcolaScarto(fine1, inizio2) {
 }
 
 function calcolaColoreGiornata(turnoMatteo, turnoSara) {
-    if (!turnoMatteo || !turnoSara) return COLORI_CELLE.VERDE;
+    // Se uno dei due turni non esiste nel dizionario, ritorna verde
+    if (!turnoMatteo || !turnoSara || !turni[turnoMatteo] || !turni[turnoSara]) {
+        return COLORI_CELLE.VERDE;
+    }
 
     const inizioMatteo = parseTime(turni[turnoMatteo].inizio);
     const fineMatteo = parseTime(turni[turnoMatteo].fine);
@@ -113,6 +106,15 @@ function creaEventoPersona(persona, numeroTreno, data) {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
+    // Popola il select dei treni
+    const selectTreni = document.getElementById('numero-treno');
+    Object.keys(turni).forEach(numeroTreno => {
+        const option = document.createElement('option');
+        option.value = numeroTreno;
+        option.textContent = `${numeroTreno} (${turni[numeroTreno].inizio}-${turni[numeroTreno].fine})`;
+        selectTreni.appendChild(option);
+    });
+
     const calendarEl = document.getElementById('calendario');
     calendarInstance = new FullCalendar.Calendar(calendarEl, {
         initialView: 'dayGridMonth',
@@ -300,14 +302,11 @@ function importaConfig(input) {
                 const configImportata = JSON.parse(e.target.result);
                 
                 // Verifica che il file contenga i dati necessari
-                if (!configImportata.turniStandard || !configImportata.logicaColori || !configImportata.stiliDefault) {
+                if (!configImportata.logicaColori || !configImportata.stiliDefault) {
                     throw new Error('File di configurazione non valido');
                 }
 
                 if (confirm('Questa operazione sovrascriverà la configurazione esistente. Continuare?')) {
-                    // Applica la nuova configurazione
-                    Object.assign(turni, configImportata.turniStandard);
-                    
                     // Aggiorna gli stili CSS dinamicamente
                     const root = document.documentElement;
                     Object.entries(configImportata.stiliDefault).forEach(([key, value]) => {
@@ -413,4 +412,44 @@ function importaDati(input) {
     
     // Reset input file
     input.value = '';
+}
+
+// Modifichiamo la funzione aggiungiTurnoStraordinario per salvare nel localStorage
+function aggiungiTurnoStraordinario() {
+    const numeroTreno = document.getElementById('nuovo-treno').value;
+    const oraInizio = document.getElementById('ora-inizio').value;
+    const oraFine = document.getElementById('ora-fine').value;
+
+    if (!numeroTreno || !oraInizio || !oraFine) {
+        alert('Inserisci tutti i dati richiesti');
+        return;
+    }
+
+    if (turni[numeroTreno]) {
+        alert('Questo numero treno esiste già nel dizionario');
+        return;
+    }
+
+    // Aggiungi il nuovo turno al dizionario
+    turni[numeroTreno] = {
+        inizio: oraInizio,
+        fine: oraFine
+    };
+
+    // Salva nel localStorage
+    localStorage.setItem('turniDizionario', JSON.stringify(turni));
+
+    // Aggiorna il select dei treni
+    const selectTreni = document.getElementById('numero-treno');
+    const option = document.createElement('option');
+    option.value = numeroTreno;
+    option.textContent = `${numeroTreno} (${oraInizio}-${oraFine})`;
+    selectTreni.appendChild(option);
+
+    // Reset form
+    document.getElementById('nuovo-treno').value = '';
+    document.getElementById('ora-inizio').value = '';
+    document.getElementById('ora-fine').value = '';
+
+    alert('Turno straordinario aggiunto con successo!');
 } 
