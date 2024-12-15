@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <title>Gestione Turni Famiglia</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <h2>Gestione Turni</h2>
+            <div class="form-group">
+                <label>Aggiungi Turno:</label>
+                <input type="date" id="data-turno">
+                <select id="persona">
+                    <option value="matteo">Matteo</option>
+                    <option value="sara">Sara</option>
+                </select>
+                <input type="text" id="numero-treno" placeholder="Numero Treno">
+                <button onclick="aggiungiTurno()">Aggiungi</button>
+                <button onclick="ripulisciGiorno()" class="button-delete">Ripulisci Giorno</button>
+            </div>
+            <div class="colori-section">
+                <h3>Personalizza Colori</h3>
+                <div class="color-picker-group">
+                    <label>Sfondo Matteo:</label>
+                    <input type="color" id="coloreMatteo" value="#ADD8E6" onchange="cambiaColore('matteo', this.value, 'background')">
+                </div>
+                <div class="color-picker-group">
+                    <label>Font Matteo:</label>
+                    <input type="color" id="coloreFontMatteo" value="#FFFFFF" onchange="cambiaColore('matteo', this.value, 'font')">
+                </div>
+                <div class="color-picker-group">
+                    <label>Sfondo Sara:</label>
+                    <input type="color" id="coloreSara" value="#FFB6C1" onchange="cambiaColore('sara', this.value, 'background')">
+                </div>
+                <div class="color-picker-group">
+                    <label>Font Sara:</label>
+                    <input type="color" id="coloreFontSara" value="#000000" onchange="cambiaColore('sara', this.value, 'font')">
+                </div>
+            </div>
+            <div class="backup-section">
+                <h3>Backup Dati</h3>
+                <div class="backup-buttons">
+                    <div class="backup-group">
+                        <h4>Dati Calendario</h4>
+                        <button onclick="esportaDati()" class="button-export">Esporta Dati</button>
+                        <input type="file" id="importFile" accept=".json" style="display: none;" onchange="importaDati(this)">
+                        <button onclick="document.getElementById('importFile').click()" class="button-import">Importa Dati</button>
+                    </div>
+                    <div class="backup-group">
+                        <h4>Configurazione</h4>
+                        <button onclick="esportaConfig()" class="button-export">Esporta Config</button>
+                        <input type="file" id="importConfig" accept=".json" style="display: none;" onchange="importaConfig(this)">
+                        <button onclick="document.getElementById('importConfig').click()" class="button-import">Importa Config</button>
+                    </div>
+                </div>
+            </div>
+            <div class="legenda">
+                <h3>Legenda</h3>
+                <div class="legenda-item"><span class="color-box red"></span> Sovrapposizione</div>
+                <div class="legenda-item"><span class="color-box yellow"></span> Scarto ≤ 2 ore</div>
+                <div class="legenda-item"><span class="color-box green"></span> Scarto > 2 ore</div>
+            </div>
+        </div>
+        <div id="calendario"></div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+    <script src="turni.js"></script>
+</body>
+</html> 

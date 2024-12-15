@@ -1,0 +1,313 @@
+body {
+    margin: 0;
+    padding: 20px;
+    min-height: 100vh;
+    background: linear-gradient(
+        to bottom right,
+        #ebda23,        /* Azzurro più scuro */
+        #4299e1,        /* Azzurro medio */
+        #90cdf4         /* Azzurro chiaro pastello */
+    ) !important;
+    font-family: Arial, sans-serif;
+}
+
+.container {
+    display: flex;
+    height: 100vh;
+    padding: 20px;
+    gap: 20px;
+}
+
+.sidebar {
+    width: 300px;
+    padding: 20px;
+    background-color: #f5f5f5;
+    border-radius: 8px;
+}
+
+#calendario {
+    flex-grow: 1;
+    background-color: white;
+    border-radius: 8px;
+    padding: 20px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.form-group input,
+.form-group select,
+.form-group button {
+    padding: 8px;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+}
+
+.form-group button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+.button-delete {
+    background-color: #ff4444 !important;
+}
+
+.form-group button:hover {
+    opacity: 0.9;
+}
+
+.legenda {
+    margin-top: 20px;
+}
+
+.legenda-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 5px 0;
+}
+
+.color-box {
+    width: 20px;
+    height: 20px;
+    border-radius: 4px;
+}
+
+.red { background-color: #f10b22; }
+.yellow { background-color: #f1ea0f; }
+.green { background-color: #09ec10; }
+
+.selected-day {
+    border: 2px solid #4a90e2 !important;
+    box-shadow: 0 0 10px rgba(74, 144, 226, 0.3);
+}
+
+.colori-section {
+    margin: 20px 0;
+    padding: 15px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.color-picker-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 10px 0;
+}
+
+.color-picker-group label {
+    flex: 1;
+}
+
+.color-picker-group input[type="color"] {
+    width: 50px;
+    height: 30px;
+    padding: 0;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+/* Aggiungi questi stili per forzare l'opacità */
+.fc-event-bg {
+    opacity: 1 !important;
+}
+
+.fc .fc-bg-event {
+    opacity: 1 !important;
+}
+
+/* Assicurati che le label dei turni mantengano la loro opacità */
+.turno-label {
+    opacity: 1 !important;
+}
+
+/* Stili per le label degli eventi */
+.fc-event {
+    margin: 2px !important;
+    padding: 6px 8px !important;
+    border-radius: 12px !important;
+    font-size: 1em !important;
+    font-weight: 500 !important;
+    text-align: center !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    min-height: 20px !important;
+}
+
+.turno-label {
+    margin: 2px !important;
+    padding: 1px 8px !important;
+    border-radius: 12px !important;
+    font-size: 1em !important;
+    font-weight: 500 !important;
+    text-align: center !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    min-height: 14px !important;
+    
+    max-width: 85% !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+}
+
+/* Aggiungi questi stili per standardizzare la dimensione delle celle */
+.fc .fc-daygrid-day {
+    min-height: 120px !important;
+    padding: 0 !important;
+}
+
+.fc .fc-daygrid-day.fc-day-has-events {
+    padding: 4px !important;
+}
+
+.fc .fc-daygrid-day-frame {
+    min-height: 120px !important;
+    height: 100% !important;
+    background-color: white !important;
+    border-radius: 4px !important;
+    overflow: hidden !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+.fc .fc-daygrid-day-events {
+    min-height: 80px !important;
+    padding-left: 6px !important;
+    padding-right: 6px !important;
+}
+
+/* Manteniamo gli stili esistenti per le label */
+.fc-event {
+    /* ... stili esistenti ... */
+}
+
+.turno-label {
+    /* ... stili esistenti ... */
+}
+
+/* Aggiungi questi stili */
+.backup-section {
+    margin: 20px 0;
+    padding: 15px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.backup-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.button-export {
+    background-color: #4CAF50 !important;
+    color: white !important;
+    padding: 8px 16px !important;
+    border: none !important;
+    border-radius: 4px !important;
+    cursor: pointer !important;
+}
+
+.button-import {
+    background-color: #2196F3 !important;
+    color: white !important;
+    padding: 8px 16px !important;
+    border: none !important;
+    border-radius: 4px !important;
+    cursor: pointer !important;
+}
+
+.button-export:hover, .button-import:hover {
+    opacity: 0.9;
+}
+
+/* Stile di default per le celle - senza padding */
+.fc .fc-daygrid-day {
+    min-height: 120px !important;
+    padding: 0 !important;
+}
+
+/* Aggiungi padding solo quando c'è un evento di background */
+.fc .fc-daygrid-day.fc-day-has-events {
+    padding: 2px !important;
+}
+
+.fc .fc-daygrid-day-frame {
+    min-height: 120px !important;
+    height: 100% !important;
+    background-color: white !important;
+    border-radius: 4px !important;
+    overflow: hidden !important;
+}
+
+/* Rimuovi il background bianco dal frame quando è il giorno corrente */
+.fc .fc-day-today .fc-daygrid-day-frame {
+    background-color: transparent !important;
+}
+
+.fc .fc-daygrid-day-events {
+    min-height: 80px !important;
+    padding-left: 6px !important;
+    padding-right: 6px !important;
+}
+
+/* ... resto degli stili esistenti ... */
+
+.backup-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 10px;
+    background-color: #f5f5f5;
+    border-radius: 4px;
+}
+
+.backup-group h4 {
+    margin: 0;
+    font-size: 0.9em;
+    color: #666;
+}
+
+/* Reset padding di default */
+.fc .fc-daygrid-day {
+    min-height: 120px !important;
+    padding: 0 !important;
+}
+
+/* Forza il padding per celle con eventi */
+.fc .fc-daygrid-day.fc-day-has-events {
+    padding: 4px !important;
+}
+
+/* Rimuovi eventuali padding interni che potrebbero interferire */
+.fc .fc-daygrid-day-frame {
+    min-height: 120px !important;
+    height: 100% !important;
+    background-color: white !important;
+    border-radius: 4px !important;
+    overflow: hidden !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+/* Forza il padding anche sull'evento di background */
+.fc .fc-bg-event {
+    margin: 4px !important;
+    opacity: 1 !important;
+}
+
+/* ... resto degli stili esistenti ... */
+  </rewritten_file>
+  
