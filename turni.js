@@ -120,8 +120,22 @@ function calcolaColoreGiornata(turnoMatteo, turnoSara) {
     console.log('Turni oggi - Matteo:', turnoMatteo, 'Sara:', turnoSara);
     console.log('Turni ieri - Matteo:', turniIeri.matteo, 'Sara:', turniIeri.sara);
 
-    // Se uno dei due è in Riposo, ecc...
     const turniRiposo = ["Riposo", "Intervallo", "Ferie", "Malattia", "Parentale"];
+    
+    // Se uno dei due è in Dispo e l'altro è in riposo/ferie/ecc, la cella è verde
+    if ((turnoMatteo === "Dispo" && turniRiposo.includes(turnoSara)) || 
+        (turnoSara === "Dispo" && turniRiposo.includes(turnoMatteo))) {
+        console.log('Cella verde per Dispo + Riposo/Ferie/ecc');
+        return COLORI_CELLE.VERDE;
+    }
+
+    // Se uno dei due è in Dispo (e l'altro non è in riposo), la cella è rossa
+    if (turnoMatteo === "Dispo" || turnoSara === "Dispo") {
+        console.log('Cella rossa per presenza di Dispo');
+        return COLORI_CELLE.ROSSO;
+    }
+
+    // Se uno dei due è in Riposo, ecc...
     if (turniRiposo.includes(turnoMatteo) || turniRiposo.includes(turnoSara)) {
         console.log('Cella verde per Riposo/Ferie/ecc');
         return COLORI_CELLE.VERDE;
