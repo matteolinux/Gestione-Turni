@@ -18,15 +18,68 @@ body {
     gap: 20px;
 }
 
+/* Media query per schermi piccoli */
+@media screen and (max-width: 768px) {
+    .container {
+        flex-direction: column;
+        height: auto;
+        padding: 10px;
+        gap: 10px;
+    }
+
+    .sidebar {
+        width: 100%;
+        height: auto;
+        max-height: none;
+        margin-bottom: 20px;
+    }
+
+    #calendario {
+        width: 100%;
+        overflow-x: auto;
+    }
+
+    .form-group {
+        gap: 5px;
+    }
+
+    .orari-group {
+        flex-direction: column;
+    }
+
+    .backup-buttons {
+        flex-direction: column;
+    }
+
+    .color-picker-group {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}
+
+/* Media query per tablet */
+@media screen and (min-width: 769px) and (max-width: 1024px) {
+    .sidebar {
+        width: 250px;
+    }
+
+    .form-group {
+        gap: 8px;
+    }
+}
+
 .sidebar {
-    width: 300px;
+    width: clamp(250px, 25vw, 300px);
     padding: 20px;
     background-color: #f5f5f5;
     border-radius: 8px;
+    overflow-y: auto;
+    height: calc(100vh - 40px);
 }
 
 #calendario {
     flex-grow: 1;
+    min-width: 0; /* Importante per il flex-shrink */
     background-color: white;
     border-radius: 8px;
     padding: 20px;
@@ -42,9 +95,9 @@ body {
 .form-group input,
 .form-group select,
 .form-group button {
-    padding: 8px;
-    border-radius: 4px;
-    border: 1px solid #ddd;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
 }
 
 .form-group button {
@@ -64,6 +117,13 @@ body {
 
 .legenda {
     margin-top: 20px;
+    padding: 15px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    width: calc(100% - 30px);
+    margin-bottom: 20px;
+    box-sizing: border-box;
 }
 
 .legenda-item {
@@ -100,7 +160,7 @@ body {
     display: flex;
     align-items: center;
     gap: 10px;
-    margin: 10px 0;
+    flex-wrap: wrap;
 }
 
 .color-picker-group label {
@@ -208,7 +268,7 @@ body {
 .backup-buttons {
     display: flex;
     gap: 10px;
-    margin-top: 10px;
+    flex-wrap: wrap;
 }
 
 .button-export {
@@ -326,6 +386,50 @@ body {
 .button-add {
     background-color: #2196F3 !important;
     color: white !important;
+}
+
+.emma-check {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 5px 0;
+    padding: 8px;
+    background-color: #fff;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+}
+
+.emma-check input[type="checkbox"] {
+    width: auto;
+    margin: 0;
+}
+
+.emma-check label {
+    margin: 0;
+    font-size: 0.9em;
+    color: #333;
+}
+
+.turno-notturno-check {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 5px 0;
+    padding: 8px;
+    background-color: #fff;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+}
+
+.turno-notturno-check input[type="checkbox"] {
+    width: auto;
+    margin: 0;
+}
+
+.turno-notturno-check label {
+    margin: 0;
+    font-size: 0.9em;
+    color: #333;
 }
   </rewritten_file>
   

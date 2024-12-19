@@ -2,6 +2,12 @@
 <html lang="it">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="Gestione Turni Famiglia - Applicazione per la gestione dei turni familiari">
+    <meta name="theme-color" content="#4299e1">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>Gestione Turni Famiglia</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css">
     <link rel="stylesheet" href="styles.css">
@@ -13,6 +19,10 @@
             <div class="form-group">
                 <label>Aggiungi Turno:</label>
                 <input type="date" id="data-turno">
+                <div class="emma-check">
+                    <input type="checkbox" id="emma-scuola">
+                    <label for="emma-scuola">Emma a scuola (08:00-16:00)</label>
+                </div>
                 <select id="persona">
                     <option value="matteo">Matteo</option>
                     <option value="sara">Sara</option>
@@ -23,14 +33,16 @@
                 <button onclick="aggiungiTurno()">Aggiungi</button>
                 <button onclick="ripulisciGiorno()" class="button-delete">Ripulisci Giorno</button>
             </div>
-            <div class="form-group">
+            <div class="form-group" id="turno-straordinario">
                 <h3>Aggiungi Turno Straordinario</h3>
-                <input type="text" id="nuovo-treno" placeholder="Numero Nuovo Treno">
-                <div class="orari-group">
-                    <input type="time" id="ora-inizio" placeholder="Ora inizio">
-                    <input type="time" id="ora-fine" placeholder="Ora fine">
+                <input type="text" id="nuovo-treno" placeholder="Numero treno">
+                <input type="time" id="ora-inizio" placeholder="Ora inizio">
+                <input type="time" id="ora-fine" placeholder="Ora fine">
+                <div class="turno-notturno-check">
+                    <input type="checkbox" id="turno-notturno">
+                    <label for="turno-notturno">Turno finisce il giorno dopo</label>
                 </div>
-                <button onclick="aggiungiTurnoStraordinario()" class="button-add">Aggiungi al Dizionario</button>
+                <button onclick="aggiungiTurnoStraordinario()">Aggiungi Turno Straordinario</button>
             </div>
             <div class="colori-section">
                 <h3>Personalizza Colori</h3>
