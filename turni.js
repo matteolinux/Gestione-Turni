@@ -107,102 +107,87 @@ function verificaOrariScuola(turno) {
 }
 
 function calcolaColoreGiornata(turnoMatteo, turnoSara) {
-    // Se uno dei due è in Riposo, Intervallo, Ferie, Malattia o Parentale OGGI, la cella è verde
+    const dataInput = document.getElementById('data-turno');
+    const dataCorrente = dataInput && dataInput.value ? dataInput.value : new Date().toISOString().split('T')[0];
+    
+    console.log('=== INIZIO CALCOLO COLORE ===');
+    console.log('Data:', dataCorrente);
+    console.log('Turno Matteo:', turnoMatteo);
+    console.log('Turno Sara:', turnoSara);
+    console.log('Emma a scuola:', emmaScuolaStato[dataCorrente] ?? eventi[dataCorrente]?.emmaScuola);
+
+    // Verifica turni notturni del giorno precedente
+    const dataObj = new Date(dataCorrente);
+    const ieri = new Date(dataObj);
+    ieri.setDate(ieri.getDate() - 1);
+    const dataIeri = ieri.toISOString().split('T')[0];
+    const turniIeri = eventi[dataIeri] || {};
+    
+    console.log('Turno Sara ieri:', turniIeri.sara);
+    console.log('È notturno?:', turni[turniIeri.sara]?.giornoSuccessivo);
+    
+    // Se c'è un turno notturno dal giorno prima
+    if (turniIeri.sara && turni[turniIeri.sara]?.giornoSuccessivo) {
+        console.log('Trovato turno notturno:', turniIeri.sara);
+        
+        // Se Emma è a scuola o Matteo ha turno Scuola
+        if ((emmaScuolaStato[dataCorrente] ?? eventi[dataCorrente]?.emmaScuola) || turnoMatteo === "Scuola") {
+            console.log('Emma è a scuola o Matteo ha turno Scuola');
+            
+            const inizioMatteo = turnoMatteo ? parseTime(turni[turnoMatteo].inizio) : null;
+            const fineMatteo = turnoMatteo ? parseTime(turni[turnoMatteo].fine, turni[turnoMatteo].giornoSuccessivo) : null;
+            const fineSaraNotturno = parseTime(turni[turniIeri.sara].fine, true);
+
+            console.log('Orari:');
+            console.log('- Matteo inizio:', inizioMatteo);
+            console.log('- Matteo fine:', fineMatteo);
+            console.log('- Sara fine (notturno):', fineSaraNotturno);
+
+            const mattinaCoperta = 
+                (inizioMatteo >= parseTime("09:30") || fineMatteo <= parseTime("07:00")) ||
+                fineSaraNotturno <= parseTime("07:00");
+
+            const pomeriggioCoperto = 
+                (fineMatteo <= parseTime("15:00") || inizioMatteo >= parseTime("16:30")) ||
+                fineSaraNotturno <= parseTime("15:00");
+            
+            console.log('Mattina coperta:', mattinaCoperta);
+            console.log('Pomeriggio coperto:', pomeriggioCoperto);
+            
+            const colore = (mattinaCoperta && pomeriggioCoperto) ? COLORI_CELLE.VERDE : COLORI_CELLE.ROSSO;
+            console.log('Colore calcolato:', colore);
+            return colore;
+        }
+    }
+
+    // Se uno dei due è in Riposo, ecc...
     if (turnoMatteo === "Riposo" || turnoMatteo === "Intervallo" || turnoMatteo === "Ferie" || 
         turnoMatteo === "Malattia" || turnoMatteo === "Parentale" || 
         turnoSara === "Riposo" || turnoSara === "Intervallo" || turnoSara === "Ferie" || 
         turnoSara === "Malattia" || turnoSara === "Parentale") {
+        console.log('Cella verde per Riposo/Ferie/ecc');
         return COLORI_CELLE.VERDE;
     }
 
-    // Se uno dei due non ha turno, cella verde
-    if (!turnoMatteo || !turnoSara || !turni[turnoMatteo] || !turni[turnoSara]) {
-        return COLORI_CELLE.VERDE;
-    }
-
-    const inizioMatteo = parseTime(turni[turnoMatteo].inizio);
-    const fineMatteo = parseTime(turni[turnoMatteo].fine, turni[turnoMatteo].giornoSuccessivo);
-    const inizioSara = parseTime(turni[turnoSara].inizio);
-    const fineSara = parseTime(turni[turnoSara].fine, turni[turnoSara].giornoSuccessivo);
-
-    const dataInput = document.getElementById('data-turno');
-    const dataCorrente = dataInput && dataInput.value ? dataInput.value : new Date().toISOString().split('T')[0];
-    
-    // Verifica che la data sia valida
-    const dataCorrenteObj = new Date(dataCorrente);
-    if (isNaN(dataCorrenteObj.getTime())) {
-        console.error('Data non valida:', dataCorrente);
-        return COLORI_CELLE.VERDE;
-    }
-
-    const ieri = new Date(dataCorrenteObj);
-    ieri.setDate(ieri.getDate() - 1);
-    const dataIeri = ieri.toISOString().split('T')[0];
-    
-    // Controlliamo i turni di ieri
-    const turniIeri = eventi[dataIeri] || {};
-    const turnoIeriMatteo = turniIeri.matteo;
-    const turnoIeriSara = turniIeri.sara;
-    
-    // Verifichiamo se c'è un turno notturno che finisce oggi
-    const fineTurnoNotturnoMatteo = turnoIeriMatteo && turni[turnoIeriMatteo]?.giornoSuccessivo;
-    const fineTurnoNotturnoSara = turnoIeriSara && turni[turnoIeriSara]?.giornoSuccessivo;
-
-    // Se Emma è a scuola
+    // Resto della logica esistente per i turni normali
     if (emmaScuolaStato[dataCorrente] ?? eventi[dataCorrente]?.emmaScuola) {
-        // Orari scuola
-        const inizioScuola = parseTime("08:45");
-        const fineScuola = parseTime("16:00");
+        const inizioMatteo = turnoMatteo ? parseTime(turni[turnoMatteo].inizio) : null;
+        const fineMatteo = turnoMatteo ? parseTime(turni[turnoMatteo].fine, turni[turnoMatteo].giornoSuccessivo) : null;
+        const inizioSara = turnoSara ? parseTime(turni[turnoSara].inizio) : null;
+        const fineSara = turnoSara ? parseTime(turni[turnoSara].fine, turni[turnoSara].giornoSuccessivo) : null;
 
-        // Verifica gestione mattina (qualcuno deve essere disponibile per portare Emma a scuola)
         const mattinaCoperta = 
-            inizioMatteo >= parseTime("09:30") || // Se Matteo inizia dopo le 9:30
-            inizioSara >= parseTime("09:30") ||   // Se Sara inizia dopo le 9:30
-            fineMatteo <= parseTime("07:00") ||   // Se Matteo finisce prima delle 7:00
-            fineSara <= parseTime("07:00");       // Se Sara finisce prima delle 7:00
+            (inizioMatteo >= parseTime("09:30") || fineMatteo <= parseTime("07:00")) ||
+            (inizioSara >= parseTime("09:30") || fineSara <= parseTime("07:00"));
 
-        // Verifica gestione pomeriggio (qualcuno deve essere disponibile per prendere Emma da scuola)
         const pomeriggioCoperto = 
-            fineMatteo <= parseTime("15:00") ||   // Se Matteo finisce prima delle 15:00
-            fineSara <= parseTime("15:00") ||     // Se Sara finisce prima delle 15:00
-            inizioMatteo >= parseTime("16:30") || // Se Matteo inizia dopo le 16:30
-            inizioSara >= parseTime("16:30");     // Se Sara inizia dopo le 16:30
-
-        // La giornata è verde solo se sia mattina che pomeriggio sono coperti
+            (fineMatteo <= parseTime("15:00") || inizioMatteo >= parseTime("16:30")) ||
+            (fineSara <= parseTime("15:00") || inizioSara >= parseTime("16:30"));
+        
         return (mattinaCoperta && pomeriggioCoperto) ? COLORI_CELLE.VERDE : COLORI_CELLE.ROSSO;
-    } 
-    // Se Emma è a casa
-    else {
-        // Se c'è un turno notturno che finisce oggi, consideriamo la persona presente fino all'ora di fine
-        let inizioEffettivoMatteo = inizioMatteo;
-        let inizioEffettivoSara = inizioSara;
-        
-        if (fineTurnoNotturnoMatteo) {
-            inizioEffettivoMatteo = 0; // Presente dall'inizio della giornata
-        }
-        if (fineTurnoNotturnoSara) {
-            inizioEffettivoSara = 0; // Presente dall'inizio della giornata
-        }
-
-        // Verifica sovrapposizione considerando i rientri
-        if (siSovrappongono(inizioEffettivoMatteo, fineMatteo, inizioEffettivoSara, fineSara)) {
-            return COLORI_CELLE.ROSSO;
-        }
-
-        // Se uno rientra la mattina e l'altro inizia dopo, la cella è verde
-        if ((fineTurnoNotturnoMatteo && inizioSara > parseTime(turni[turnoIeriMatteo].fine)) ||
-            (fineTurnoNotturnoSara && inizioMatteo > parseTime(turni[turnoIeriSara].fine))) {
-            return COLORI_CELLE.VERDE;
-        }
-
-        // Calcola scarto considerando i rientri
-        const scartoMatteoPrima = fineTurnoNotturnoSara ? 0 : calcolaScarto(fineMatteo, inizioSara, turni[turnoMatteo]?.giornoSuccessivo);
-        const scartoSaraPrima = fineTurnoNotturnoMatteo ? 0 : calcolaScarto(fineSara, inizioMatteo, turni[turnoSara]?.giornoSuccessivo);
-        
-        const scarto = Math.max(scartoMatteoPrima, scartoSaraPrima);
-        
-        return scarto > 0 ? COLORI_CELLE.ROSSO : COLORI_CELLE.VERDE;
     }
+    
+    return COLORI_CELLE.VERDE;
 }
 
 function creaEventoPersona(persona, numeroTreno, data) {
@@ -303,6 +288,28 @@ document.addEventListener('DOMContentLoaded', function() {
             center: 'title',
             right: 'dayGridMonth,timeGridWeek'
         },
+        // Nuove opzioni per il controllo dei colori
+        dayCellClassNames: function(arg) {
+            return ['custom-day-cell'];
+        },
+        dayMaxEvents: true,
+        displayEventTime: false,
+        eventTextColor: '#212529',
+        eventColor: '#212529',
+        // Forza il colore del testo per tutti i giorni
+        dayHeaderFormat: { weekday: 'long' },
+        // Personalizzazione delle celle dei giorni
+        dayCellDidMount: function(arg) {
+            const numberEl = arg.el.querySelector('.fc-daygrid-day-number');
+            if (numberEl) {
+                numberEl.style.color = '#212529';
+                numberEl.style.opacity = '1';
+            }
+            // Rimuovi la classe fc-day-future se presente
+            if (arg.el.classList.contains('fc-day-future')) {
+                arg.el.classList.remove('fc-day-future');
+            }
+        },
         events: function(info, successCallback) {
             const eventiFormattati = [];
             
@@ -374,9 +381,13 @@ document.addEventListener('DOMContentLoaded', function() {
             
             document.getElementById('data-turno').value = selectedDate;
             aggiornaCheckboxEmma(selectedDate);
+        },
+        datesSet: function() {
+            setTimeout(fixDayNumbers, 0);
         }
     });
     calendarInstance.render();
+    setTimeout(fixDayNumbers, 0);
 
     // Recupera i colori salvati o usa i default
     coloreMatteo = localStorage.getItem('coloreMatteo') || COLORI_DEFAULT.MATTEO.background;
@@ -390,27 +401,53 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('coloreFontMatteo').value = coloreFontMatteo;
     document.getElementById('coloreFontSara').value = coloreFontSara;
 
-    // Aggiungiamo l'event listener per la checkbox di Emma
+    // Modifica l'event listener per la checkbox di Emma
     document.getElementById('emma-scuola').addEventListener('change', function(e) {
-        const data = document.getElementById('data-turno').value;
-        if (!data) return;
+        // Verifica se c'è una cella selezionata
+        const selectedCell = document.querySelector('.selected-day');
+        if (!selectedCell) {
+            alert('Seleziona prima una data!');
+            e.target.checked = false;
+            return;
+        }
 
-        // Aggiorna lo stato nel dizionario
-        emmaScuolaStato[data] = e.target.checked;
-        
-        // Aggiorna lo stato negli eventi
+        const data = selectedCell.dataset.date;
+        console.log('=== MODIFICA STATO EMMA ===');
+        console.log('Data selezionata:', data);
+        console.log('Stato precedente:', emmaScuolaStato[data]);
+        console.log('Nuovo stato:', e.target.checked);
+
+        // Aggiorna lo stato SOLO per la data selezionata
         if (!eventi[data]) {
             eventi[data] = {};
         }
         eventi[data].emmaScuola = e.target.checked;
+        emmaScuolaStato[data] = e.target.checked;
         
         // Salva nel localStorage
         localStorage.setItem('emmaScuolaStati', JSON.stringify(emmaScuolaStato));
         localStorage.setItem('eventi', JSON.stringify(eventi));
         
-        // Aggiorna immediatamente il calendario
+        // Aggiorna SOLO la cella selezionata
         if (calendarInstance) {
-            calendarInstance.refetchEvents();
+            const eventiGiorno = calendarInstance.getEvents().filter(event => 
+                event.startStr === data && event.display === 'background'
+            );
+            
+            // Rimuovi l'evento di background esistente
+            eventiGiorno.forEach(event => event.remove());
+            
+            // Ricalcola il colore solo per questa data
+            const turniGiorno = eventi[data] || {};
+            const coloreGiornata = calcolaColoreGiornata(turniGiorno.matteo, turniGiorno.sara);
+            
+            // Aggiungi il nuovo evento di background
+            calendarInstance.addEvent({
+                start: data,
+                display: 'background',
+                backgroundColor: coloreGiornata,
+                classNames: ['giorno-background-transparent'],
+            });
         }
     });
 });
@@ -741,4 +778,29 @@ document.getElementById('numero-treno').addEventListener('change', function(e) {
     currentSelection.treno = e.target.value;
     localStorage.setItem('currentTreno', currentSelection.treno);
 });
+
+// Aggiungi questa funzione dopo l'inizializzazione del calendario
+function fixDayNumbers() {
+    // Rimuovi la classe fc-day-future da tutte le celle
+    const futureDays = document.querySelectorAll('.fc-day-future');
+    futureDays.forEach(day => {
+        day.classList.remove('fc-day-future');
+    });
+    
+    // Forza il colore nero su tutti i numeri
+    const dayNumbers = document.querySelectorAll('.fc-daygrid-day-number');
+    dayNumbers.forEach(number => {
+        number.style.color = '#212529';
+        number.style.opacity = '1';
+    });
+}
+
+// Aggiungi questa funzione per verificare lo stato di Emma per ogni data
+function verificaStatoEmma(data) {
+    console.log('=== VERIFICA STATO EMMA ===');
+    console.log('Data:', data);
+    console.log('Stato in emmaScuolaStato:', emmaScuolaStato[data]);
+    console.log('Stato in eventi:', eventi[data]?.emmaScuola);
+    return emmaScuolaStato[data] ?? eventi[data]?.emmaScuola;
+}
  
