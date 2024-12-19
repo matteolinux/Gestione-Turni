@@ -110,83 +110,74 @@ function calcolaColoreGiornata(turnoMatteo, turnoSara) {
     const dataInput = document.getElementById('data-turno');
     const dataCorrente = dataInput && dataInput.value ? dataInput.value : new Date().toISOString().split('T')[0];
     
-    console.log('=== INIZIO CALCOLO COLORE ===');
-    console.log('Data:', dataCorrente);
-    console.log('Turno Matteo:', turnoMatteo);
-    console.log('Turno Sara:', turnoSara);
-    console.log('Emma a scuola:', emmaScuolaStato[dataCorrente] ?? eventi[dataCorrente]?.emmaScuola);
-
-    // Verifica turni notturni del giorno precedente
-    const dataObj = new Date(dataCorrente);
-    const ieri = new Date(dataObj);
+    // Recupera i turni del giorno precedente
+    const ieri = new Date(new Date(dataCorrente));
     ieri.setDate(ieri.getDate() - 1);
     const dataIeri = ieri.toISOString().split('T')[0];
     const turniIeri = eventi[dataIeri] || {};
-    
-    console.log('Turno Sara ieri:', turniIeri.sara);
-    console.log('È notturno?:', turni[turniIeri.sara]?.giornoSuccessivo);
-    
-    // Se c'è un turno notturno dal giorno prima
-    if (turniIeri.sara && turni[turniIeri.sara]?.giornoSuccessivo) {
-        console.log('Trovato turno notturno:', turniIeri.sara);
-        
-        // Se Emma è a scuola o Matteo ha turno Scuola
-        if ((emmaScuolaStato[dataCorrente] ?? eventi[dataCorrente]?.emmaScuola) || turnoMatteo === "Scuola") {
-            console.log('Emma è a scuola o Matteo ha turno Scuola');
-            
-            const inizioMatteo = turnoMatteo ? parseTime(turni[turnoMatteo].inizio) : null;
-            const fineMatteo = turnoMatteo ? parseTime(turni[turnoMatteo].fine, turni[turnoMatteo].giornoSuccessivo) : null;
-            const fineSaraNotturno = parseTime(turni[turniIeri.sara].fine, true);
 
-            console.log('Orari:');
-            console.log('- Matteo inizio:', inizioMatteo);
-            console.log('- Matteo fine:', fineMatteo);
-            console.log('- Sara fine (notturno):', fineSaraNotturno);
-
-            const mattinaCoperta = 
-                (inizioMatteo >= parseTime("09:30") || fineMatteo <= parseTime("07:00")) ||
-                fineSaraNotturno <= parseTime("07:00");
-
-            const pomeriggioCoperto = 
-                (fineMatteo <= parseTime("15:00") || inizioMatteo >= parseTime("16:30")) ||
-                fineSaraNotturno <= parseTime("15:00");
-            
-            console.log('Mattina coperta:', mattinaCoperta);
-            console.log('Pomeriggio coperto:', pomeriggioCoperto);
-            
-            const colore = (mattinaCoperta && pomeriggioCoperto) ? COLORI_CELLE.VERDE : COLORI_CELLE.ROSSO;
-            console.log('Colore calcolato:', colore);
-            return colore;
-        }
-    }
+    console.log('\n=== CALCOLO COLORE PER:', dataCorrente, '===');
+    console.log('Turni oggi - Matteo:', turnoMatteo, 'Sara:', turnoSara);
+    console.log('Turni ieri - Matteo:', turniIeri.matteo, 'Sara:', turniIeri.sara);
 
     // Se uno dei due è in Riposo, ecc...
-    if (turnoMatteo === "Riposo" || turnoMatteo === "Intervallo" || turnoMatteo === "Ferie" || 
-        turnoMatteo === "Malattia" || turnoMatteo === "Parentale" || 
-        turnoSara === "Riposo" || turnoSara === "Intervallo" || turnoSara === "Ferie" || 
-        turnoSara === "Malattia" || turnoSara === "Parentale") {
+    const turniRiposo = ["Riposo", "Intervallo", "Ferie", "Malattia", "Parentale"];
+    if (turniRiposo.includes(turnoMatteo) || turniRiposo.includes(turnoSara)) {
         console.log('Cella verde per Riposo/Ferie/ecc');
         return COLORI_CELLE.VERDE;
     }
 
-    // Resto della logica esistente per i turni normali
-    if (emmaScuolaStato[dataCorrente] ?? eventi[dataCorrente]?.emmaScuola) {
-        const inizioMatteo = turnoMatteo ? parseTime(turni[turnoMatteo].inizio) : null;
-        const fineMatteo = turnoMatteo ? parseTime(turni[turnoMatteo].fine, turni[turnoMatteo].giornoSuccessivo) : null;
-        const inizioSara = turnoSara ? parseTime(turni[turnoSara].inizio) : null;
-        const fineSara = turnoSara ? parseTime(turni[turnoSara].fine, turni[turnoSara].giornoSuccessivo) : null;
+    // Verifica rientri notturni dal giorno precedente
+    const rientroMatteo = turniIeri.matteo && turni[turniIeri.matteo]?.giornoSuccessivo;
+    const rientroSara = turniIeri.sara && turni[turniIeri.sara]?.giornoSuccessivo;
 
-        const mattinaCoperta = 
-            (inizioMatteo >= parseTime("09:30") || fineMatteo <= parseTime("07:00")) ||
-            (inizioSara >= parseTime("09:30") || fineSara <= parseTime("07:00"));
+    if (rientroMatteo || rientroSara) {
+        console.log('Rientri notturni trovati - Matteo:', rientroMatteo, 'Sara:', rientroSara);
 
-        const pomeriggioCoperto = 
-            (fineMatteo <= parseTime("15:00") || inizioMatteo >= parseTime("16:30")) ||
-            (fineSara <= parseTime("15:00") || inizioSara >= parseTime("16:30"));
-        
-        return (mattinaCoperta && pomeriggioCoperto) ? COLORI_CELLE.VERDE : COLORI_CELLE.ROSSO;
+        if (rientroMatteo && rientroSara) {
+            const fineMatteoIeri = parseTime(turni[turniIeri.matteo].fine, true);
+            const fineSaraIeri = parseTime(turni[turniIeri.sara].fine, true);
+            
+            // Se entrambi hanno rientro e c'è sovrapposizione nelle prime ore
+            if (fineMatteoIeri > 0 && fineSaraIeri > 0 && 
+                Math.min(fineMatteoIeri, fineSaraIeri) > 0) {
+                console.log('Sovrapposizione nei rientri notturni');
+                return COLORI_CELLE.ROSSO;
+            }
+        }
+
+        // Verifica sovrapposizione tra rientro e nuovo turno
+        if (turnoMatteo && rientroSara) {
+            const inizioMatteo = parseTime(turni[turnoMatteo].inizio);
+            const fineSaraIeri = parseTime(turni[turniIeri.sara].fine, true);
+            if (inizioMatteo < fineSaraIeri) {
+                console.log('Sovrapposizione tra nuovo turno Matteo e rientro Sara');
+                return COLORI_CELLE.ROSSO;
+            }
+        }
+        if (turnoSara && rientroMatteo) {
+            const inizioSara = parseTime(turni[turnoSara].inizio);
+            const fineMatteoIeri = parseTime(turni[turniIeri.matteo].fine, true);
+            if (inizioSara < fineMatteoIeri) {
+                console.log('Sovrapposizione tra nuovo turno Sara e rientro Matteo');
+                return COLORI_CELLE.ROSSO;
+            }
+        }
     }
-    
+
+    // Verifica sovrapposizione dei turni di oggi
+    if (turnoMatteo && turnoSara) {
+        const inizioMatteo = parseTime(turni[turnoMatteo].inizio);
+        const fineMatteo = parseTime(turni[turnoMatteo].fine, turni[turnoMatteo].giornoSuccessivo);
+        const inizioSara = parseTime(turni[turnoSara].inizio);
+        const fineSara = parseTime(turni[turnoSara].fine, turni[turnoSara].giornoSuccessivo);
+
+        if (siSovrappongono(inizioMatteo, fineMatteo, inizioSara, fineSara)) {
+            console.log('Sovrapposizione tra turni di oggi');
+            return COLORI_CELLE.ROSSO;
+        }
+    }
+
     return COLORI_CELLE.VERDE;
 }
 
