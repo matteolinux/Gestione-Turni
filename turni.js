@@ -10,7 +10,10 @@ let turni = {
     "770/771": { inizio: "14:20", fine: "12:30", giornoSuccessivo: true },
     "235/234": { inizio: "15:50", fine: "16:30", giornoSuccessivo: true },
     "Riposo": { inizio: "00:00", fine: "23:59", giornoSuccessivo: false },
-    "Intervallo": { inizio: "00:00", fine: "23:59", giornoSuccessivo: false }
+    "Intervallo": { inizio: "00:00", fine: "23:59", giornoSuccessivo: false },
+    "Ferie": { inizio: "00:00", fine: "23:59", giornoSuccessivo: false },
+    "Scuola": { inizio: "07:50", fine: "17:00", giornoSuccessivo: false },
+    "Visita": { inizio: "07:50", fine: "13:00", giornoSuccessivo: false }
 };
 
 // All'inizio del file, definiamo i colori delle celle come costanti
@@ -99,11 +102,14 @@ function verificaOrariScuola(turno) {
 }
 
 function calcolaColoreGiornata(turnoMatteo, turnoSara) {
-    // Se uno dei due è in Riposo o Intervallo OGGI, la cella è verde
-    if (turnoMatteo === "Riposo" || turnoMatteo === "Intervallo" || 
-        turnoSara === "Riposo" || turnoSara === "Intervallo") {
+    // Se uno dei due è in Riposo, Intervallo o Ferie OGGI, la cella è verde
+    if (turnoMatteo === "Riposo" || turnoMatteo === "Intervallo" || turnoMatteo === "Ferie" || 
+        turnoSara === "Riposo" || turnoSara === "Intervallo" || turnoSara === "Ferie") {
         return COLORI_CELLE.VERDE;
     }
+
+    // Se uno dei due è in Scuola o Visita, trattiamolo come un turno normale
+    // perché dobbiamo verificare la copertura degli orari
 
     const dataInput = document.getElementById('data-turno');
     // Se non c'è un elemento data-turno o non ha un valore, usa la data corrente
