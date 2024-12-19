@@ -186,39 +186,47 @@ function calcolaColoreGiornata(turnoMatteo, turnoSara) {
 
     // Se Emma è a scuola
     if (emmaAScuola) {
-        // Verifica gestione mattina (qualcuno deve essere a casa o iniziare dopo le 11:00)
-        const mattinaCoperta = 
-            inizioMatteo >= parseTime("11:00") || 
-            inizioSara >= parseTime("11:00") ||
-            fineMatteo <= parseTime("08:00") ||
-            fineSara <= parseTime("08:00");
+        // Orari scuola
+        const inizioScuola = parseTime("08:45");
+        const fineScuola = parseTime("16:00");
 
-        // Verifica gestione pomeriggio (qualcuno deve essere a casa o finire entro le 15:00 o iniziare dopo le 18:00)
+        // Verifica gestione mattina (qualcuno deve essere disponibile per portare Emma a scuola)
+        const mattinaCoperta = 
+            inizioMatteo >= parseTime("09:30") || // Se Matteo inizia dopo le 9:30
+            inizioSara >= parseTime("09:30") ||   // Se Sara inizia dopo le 9:30
+            fineMatteo <= parseTime("07:00") ||   // Se Matteo finisce prima delle 7:00
+            fineSara <= parseTime("07:00");       // Se Sara finisce prima delle 7:00
+
+        // Verifica gestione pomeriggio (qualcuno deve essere disponibile per prendere Emma da scuola)
         const pomeriggioCoperto = 
-            fineMatteo <= parseTime("15:00") || 
-            fineSara <= parseTime("15:00") ||
-            inizioMatteo >= parseTime("18:00") ||
-            inizioSara >= parseTime("18:00");
+            fineMatteo <= parseTime("15:00") ||   // Se Matteo finisce prima delle 15:00
+            fineSara <= parseTime("15:00") ||     // Se Sara finisce prima delle 15:00
+            inizioMatteo >= parseTime("16:30") || // Se Matteo inizia dopo le 16:30
+            inizioSara >= parseTime("16:30");     // Se Sara inizia dopo le 16:30
 
         // La giornata è verde solo se sia mattina che pomeriggio sono coperti
         return (mattinaCoperta && pomeriggioCoperto) ? COLORI_CELLE.VERDE : COLORI_CELLE.ROSSO;
     } 
     // Se Emma non è a scuola
     else {
-        // Calcola lo scarto in entrambe le direzioni considerando i turni notturni
+        // Se Emma è a casa, verifichiamo che ci sia sempre qualcuno con lei
+        if (siSovrappongono(inizioMatteo, fineMatteo, inizioSara, fineSara)) {
+            return COLORI_CELLE.ROSSO; // Sovrapposizione non permessa quando Emma è a casa
+        }
+
+        // Calcola lo scarto tra i turni
         const scartoMatteoPrima = calcolaScarto(fineMatteo, inizioSara, turni[turnoMatteo].giornoSuccessivo);
         const scartoSaraPrima = calcolaScarto(fineSara, inizioMatteo, turni[turnoSara].giornoSuccessivo);
         
         // Usa lo scarto maggiore tra i due
         const scarto = Math.max(scartoMatteoPrima, scartoSaraPrima);
         
-        if (scarto >= 3) {
-            return COLORI_CELLE.VERDE;
-        } else if (scarto >= 2) {
-            return COLORI_CELLE.GIALLO;
-        } else {
-            return COLORI_CELLE.ROSSO;
+        // Se Emma è a casa, deve sempre esserci qualcuno con lei
+        if (scarto > 0) {
+            return COLORI_CELLE.ROSSO; // Non può esserci scarto quando Emma è a casa
         }
+        
+        return COLORI_CELLE.VERDE; // Verde solo se c'è copertura continua
     }
 }
 
@@ -354,6 +362,30 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('coloreSara').value = coloreSara;
     document.getElementById('coloreFontMatteo').value = coloreFontMatteo;
     document.getElementById('coloreFontSara').value = coloreFontSara;
+
+    // Aggiungiamo l'event listener per la checkbox di Emma
+    document.getElementById('emma-scuola').addEventListener('change', function(e) {
+        const data = document.getElementById('data-turno').value;
+        if (!data) return;
+
+        // Aggiorna lo stato nel dizionario
+        emmaScuolaStato[data] = e.target.checked;
+        
+        // Aggiorna lo stato negli eventi
+        if (!eventi[data]) {
+            eventi[data] = {};
+        }
+        eventi[data].emmaScuola = e.target.checked;
+        
+        // Salva nel localStorage
+        localStorage.setItem('emmaScuolaStati', JSON.stringify(emmaScuolaStato));
+        localStorage.setItem('eventi', JSON.stringify(eventi));
+        
+        // Aggiorna immediatamente il calendario
+        if (calendarInstance) {
+            calendarInstance.refetchEvents();
+        }
+    });
 });
 
 function aggiungiTurno() {
