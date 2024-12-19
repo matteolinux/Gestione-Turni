@@ -415,5 +415,70 @@ body {
 }
 
 /* Tutto il resto del CSS rimane invariato */
+
+/* Aggiungi questa classe per gestire la trasparenza del background */
+.giorno-background-transparent {
+    opacity: 0.7 !important;
+    margin: 4px !important;
+    border-radius: 4px !important;
+    z-index: 1 !important;
+}
+
+/* Stile per il background colorato */
+.giorno-background-transparent {
+    opacity: 0.7 !important;
+    margin: 4px !important;
+    border-radius: 4px !important;
+    z-index: 1 !important;
+}
+
+/* Reset completo dei colori dei numeri dei giorni */
+.fc .fc-daygrid-day-number {
+    z-index: 5 !important;
+    position: relative !important;
+    padding: 4px !important;
+    background-color: transparent !important;
+    color: inherit !important;
+}
+
+/* Reset esplicito per i giorni futuri */
+.fc-day-future .fc-daygrid-day-number {
+    color: var(--fc-neutral-text-color, #808080) !important;
+}
+
+/* Stile per il giorno corrente che imita la selezione */
+.fc .fc-day-today.fc-day-has-events {
+    border: 2px solid #4a90e2 !important;
+    box-shadow: 0 0 10px rgba(74, 144, 226, 0.3) !important;
+}
+
+/* Assicuriamoci che il contenitore del numero sia sopra il background */
+.fc .fc-daygrid-day-top {
+    z-index: 5 !important;
+    position: relative !important;
+}
+
+/* Stile per il contenitore della cella */
+.fc-daygrid-day-frame {
+    position: relative !important;
+}
+
+/* Stile per il background della cella */
+.fc .fc-daygrid-day-bg {
+    margin: 4px !important;
+    border-radius: 4px !important;
+    z-index: 1 !important;
+}
+
+/* Stile specifico per il giorno corrente con eventi */
+.fc .fc-day-today.fc-day-has-events .fc-daygrid-day-frame {
+    border: 2px solid indigo !important;
+    background-color: transparent !important;
+}
+
+.fc .fc-day-today {
+    background: var(--fc-today-bg-color) !important;
+    border: 4px solid #d41df4 !important;
+}
   </rewritten_file>
   

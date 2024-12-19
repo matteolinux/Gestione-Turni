@@ -353,7 +353,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         start: data,
                         display: 'background',
                         backgroundColor: coloreGiornata,
-                        classNames: ['giorno-background']
+                        classNames: ['giorno-background-transparent'],
                     });
                 }
             });
