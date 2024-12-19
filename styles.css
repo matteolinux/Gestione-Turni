@@ -115,34 +115,6 @@ body {
     opacity: 0.9;
 }
 
-.legenda {
-    margin-top: 20px;
-    padding: 15px;
-    background-color: #fff;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    width: calc(100% - 30px);
-    margin-bottom: 20px;
-    box-sizing: border-box;
-}
-
-.legenda-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin: 5px 0;
-}
-
-.color-box {
-    width: 20px;
-    height: 20px;
-    border-radius: 4px;
-}
-
-.red { background-color: #f10b22; }
-.yellow { background-color: #f1ea0f; }
-.green { background-color: #09ec10; }
-
 .selected-day {
     border: 2px solid #4a90e2 !important;
     box-shadow: 0 0 10px rgba(74, 144, 226, 0.3);
@@ -431,5 +403,17 @@ body {
     font-size: 0.9em;
     color: #333;
 }
+
+/* Rimuovo solo le classi della legenda */
+.legenda,
+.legenda-item,
+.color-box,
+.red,
+.yellow,
+.green {
+    display: none;
+}
+
+/* Tutto il resto del CSS rimane invariato */
   </rewritten_file>
   
